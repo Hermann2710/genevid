@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
-* {
-  font-family: Poppins, Verdana, sans-serif;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+}
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #1f1f1f;
+    --surface: #f0f4f9;
+    --border: #d1d5db;
+  }
+
+  .dark {
+    --background: #131314;
+    --foreground: #e3e3e3;
+    --surface: #1e1f20;
+    --border: #333537;
+  }
+
+  * {
+    font-family: Poppins, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
 }

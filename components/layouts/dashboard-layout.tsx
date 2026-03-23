@@ -1,12 +1,14 @@
-import { SidebarProvider } from "@/contexts/main-context";
-import { ChatInput } from "../chat-input";
-import { Sidebar } from "../ui/sidebar";
-import { Header } from "../ui/header";
+"use client"
+
+import { SidebarProvider } from "@/contexts/main-context"
+import { ChatInput } from "../chat-input"
+import { Sidebar } from "../ui/sidebar"
+import { Header } from "../ui/header"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
-            <div className="flex h-screen bg-[#131314] text-[#e3e3e3] overflow-hidden">
+            <div className="flex h-screen bg-background text-foreground overflow-hidden">
                 <Sidebar />
                 <main className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar">
                     <Header />

@@ -1,43 +1,38 @@
 "use client"
 
-import { useSidebar } from "@/contexts/main-context";
-import { appConfig } from "@/lib/config";
-import { ChevronDown, Sparkles, UserCircle } from "lucide-react";
+import { useSidebar } from "@/contexts/main-context"
+import { appConfig } from "@/lib/config"
+import { ChevronDown } from "lucide-react"
+import { UserButton } from "../user-button"
+import { ThemeToggle } from "./theme-toggle"
+import { cn } from "@/lib/utils"
 
 export function Header() {
-    const { isMobile, toggleSidebar, variant } = useSidebar();
+    const { isMobile, toggleSidebar, variant } = useSidebar()
 
     return (
-        <header className="sticky top-0 z-30 flex items-center justify-between w-full h-16 px-4 bg-[#131314]/80 backdrop-blur-md">
+        <header className="sticky top-0 z-30 flex items-center justify-between w-full h-16 px-4 bg-background/80 backdrop-blur-md border-b border-border/20">
             <div className="flex items-center gap-2">
                 {isMobile && (
                     <button
                         onClick={toggleSidebar}
-                        className="p-2 text-[#c4c7c5] hover:bg-[#333537] rounded-full transition-colors"
+                        className="p-2 text-foreground/70 hover:bg-surface rounded-full transition-colors"
                     >
-                        <ChevronDown className={variant === "default" ? "rotate-180" : "rotate-270"} size={20} />
+                        <ChevronDown className={cn("transition-transform duration-300", variant === "default" ? "rotate-180" : "-rotate-90")} size={20} />
                     </button>
                 )}
 
-                <button className="flex items-center gap-2 px-3 py-1.5 text-[#e3e3e3] hover:bg-[#1e1f20] rounded-lg transition-all group">
-                    <span className="text-lg font-medium">{appConfig.appName}</span>
-                    <span className="text-gray-500 font-normal">{appConfig.appVersion}</span>
-                    <ChevronDown size={16} className="text-gray-500 group-hover:text-white transition-colors" />
+                <button className="flex items-center gap-2 px-3 py-1.5 text-foreground hover:bg-surface rounded-xl transition-all group">
+                    <span className="text-lg font-semibold tracking-tight">{appConfig.appName}</span>
+                    <span className="text-[10px] text-foreground/40 font-medium">{appConfig.appVersion}</span>
+                    <ChevronDown size={14} className="text-foreground/40 group-hover:text-foreground transition-colors" />
                 </button>
             </div>
 
-            <div className="flex items-center gap-2">
-                {!isMobile && (
-                    <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-[#1e1f20] border border-[#333537] rounded-full hover:bg-[#2d2f31] transition-colors">
-                        <Sparkles size={16} className="text-[#4285f4]" />
-                        <span className="text-sm font-medium text-white">Essayer Advanced</span>
-                    </button>
-                )}
-
-                <button className="p-1 rounded-full hover:ring-4 hover:ring-[#333537] transition-all">
-                    <UserCircle size={32} className="text-[#c4c7c5]" />
-                </button>
+            <div className="flex items-center gap-3">
+                <ThemeToggle />
+                <UserButton />
             </div>
         </header>
-    );
+    )
 }

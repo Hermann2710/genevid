@@ -1,53 +1,47 @@
-import Link from "next/link";
-import { ReactNode } from "react";
+"use client"
+
+import Link from "next/link"
+import { ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
 interface NavItemProps {
-    icon: ReactNode;
-    label: string;
-    href?: string;
-    active?: boolean;
-    collapsed?: boolean;
-    onClick?: () => void;
+    icon: ReactNode
+    label: string
+    collapsed: boolean
+    href?: string
+    onClick?: () => void
+    className?: string
 }
 
-export function NavItem({ icon, label, href = "#", active, collapsed, onClick }: NavItemProps) {
-    const baseStyles = "flex items-center gap-4 px-4 py-2.5 rounded-full transition-colors duration-200 group relative";
-
-    const activeStyles = active
-        ? "bg-[#2d2f31] text-[#e3e3e3]"
-        : "text-[#c4c7c5] hover:bg-[#2d2f31] hover:text-[#e3e3e3]";
-
+export function NavItem({ icon, label, collapsed, href, onClick, className }: NavItemProps) {
     const content = (
-        <>
-            <div className="shrink-0 w-5 h-5 flex items-center justify-center">
+        <div className={cn(
+            "flex items-center rounded-full transition-all duration-200 text-foreground hover:bg-foreground/10 group",
+            collapsed ? "w-10 h-10 justify-center mx-auto" : "px-4 py-2.5 gap-3 w-full",
+            className
+        )}>
+            <div className={cn(
+                "flex items-center justify-center shrink-0",
+                collapsed ? "text-foreground/70 group-hover:text-foreground" : ""
+            )}>
                 {icon}
             </div>
 
             {!collapsed && (
-                <span className="text-sm font-medium truncate animate-in fade-in duration-300">
+                <span className="text-sm font-medium truncate animate-in fade-in slide-in-from-left-2 duration-300">
                     {label}
                 </span>
             )}
-
-            {collapsed && (
-                <div className="absolute left-full ml-4 px-2 py-1 bg-[#333537] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                    {label}
-                </div>
-            )}
-        </>
-    );
+        </div>
+    )
 
     if (onClick) {
-        return (
-            <button onClick={onClick} className={`${baseStyles} ${activeStyles} w-full`}>
-                {content}
-            </button>
-        );
+        return <button onClick={onClick} className="w-full block outline-none">{content}</button>
     }
 
     return (
-        <Link href={href} className={`${baseStyles} ${activeStyles}`}>
+        <Link href={href || "#"} className="w-full block outline-none">
             {content}
         </Link>
-    );
+    )
 }
