@@ -2,21 +2,32 @@
 
 import { useEffect, useState } from "react"
 import { useSidebar } from "@/contexts/main-context"
+import { useChatState } from "@/contexts/chat-context"
 import { MenuIcon, PlusIcon, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SidebarSearch } from "../sidebar-search"
 import { NavItem } from "./nav-item"
 import { LogoutButton } from "../logout-btn"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 export function Sidebar() {
     const { variant, toggleSidebar } = useSidebar()
+    const { resetChat } = useChatState()
+    const { data: session } = useSession()
+    const router = useRouter()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
         setMounted(true)
     }, [])
 
-    const isCollapsed = variant === "icon"
+    const isCollapsed = variant === "collapsed"
+
+    const handleNewChat = () => {
+        resetChat()
+        router.push("/")
+    }
 
     if (!mounted) return <aside className="h-full bg-surface w-70 border-r border-border/50" />
 
@@ -28,19 +39,24 @@ export function Sidebar() {
             <div className={cn("p-4 mb-2 shrink-0 flex", isCollapsed ? "justify-center" : "justify-start")}>
                 <button
                     onClick={toggleSidebar}
-                    className="p-2 hover:bg-foreground/10 rounded-full transition-colors text-foreground/70"
+                    className="p-2 hover:bg-foreground/10 rounded-full transition-colors text-foreground/70 active:scale-95"
                 >
                     <MenuIcon className="w-6 h-6" />
                 </button>
             </div>
 
-            <div className={cn("mb-6 shrink-0", isCollapsed ? "px-0" : "px-3")}>
-                <NavItem
-                    icon={<PlusIcon size={20} />}
-                    label="Nouveau chat"
-                    collapsed={isCollapsed}
-                    className="bg-background border border-border/30"
-                />
+            <div className={cn("mb-6 shrink-0 transition-all", isCollapsed ? "px-2" : "px-3")}>
+                <button
+                    onClick={handleNewChat}
+                    className="w-full text-left"
+                >
+                    <NavItem
+                        icon={<PlusIcon size={20} />}
+                        label="Nouveau chat"
+                        collapsed={isCollapsed}
+                        className="bg-background border border-border/30 hover:border-brand/40 hover:bg-brand/5 transition-all"
+                    />
+                </button>
             </div>
 
             <SidebarSearch isCollapsed={isCollapsed} />
@@ -50,21 +66,23 @@ export function Sidebar() {
                 isCollapsed ? "px-0" : "px-3"
             )}>
                 {!isCollapsed && (
-                    <div className="pt-2 pb-2 text-[11px] font-bold px-4 text-foreground/40 uppercase tracking-widest animate-in fade-in">
+                    <div className="pt-2 pb-2 text-[11px] font-bold px-4 text-foreground/40 uppercase tracking-widest animate-in fade-in duration-500">
                         Récent
                     </div>
                 )}
             </nav>
 
-            <div className={cn("mt-auto border-t border-border/30 shrink-0 py-3 flex flex-col gap-1", isCollapsed ? "px-0" : "px-3")}>
-                <NavItem
-                    icon={<Settings size={20} />}
-                    label="Paramètres"
-                    collapsed={isCollapsed}
-                    href="/settings"
-                />
-                <LogoutButton collapsed={isCollapsed} />
-            </div>
+            {session && (
+                <div className={cn("mt-auto border-t border-border/30 shrink-0 py-3 flex flex-col gap-1", isCollapsed ? "px-0" : "px-3")}>
+                    <NavItem
+                        icon={<Settings size={20} />}
+                        label="Paramètres"
+                        collapsed={isCollapsed}
+                        href="/settings"
+                    />
+                    <LogoutButton collapsed={isCollapsed} />
+                </div>
+            )}
         </aside>
     )
 }

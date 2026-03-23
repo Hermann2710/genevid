@@ -22,10 +22,8 @@ export function Header() {
                     </button>
                 )}
 
-                <button className="flex items-center gap-2 px-3 py-1.5 text-foreground hover:bg-surface rounded-xl transition-all group">
+                <button className="flex items-center gap-2 px-3 py-1.5 text-foreground rounded-xl transition-all group">
                     <span className="text-lg font-semibold tracking-tight">{appConfig.appName}</span>
-                    <span className="text-[10px] text-foreground/40 font-medium">{appConfig.appVersion}</span>
-                    <ChevronDown size={14} className="text-foreground/40 group-hover:text-foreground transition-colors" />
                 </button>
             </div>
 
