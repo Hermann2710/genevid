@@ -12,6 +12,9 @@ const ChatSchema = new mongoose.Schema(
       },
     ],
     agentId: { type: String, default: "gemini-1.5-flash" },
+    isPinned: { type: Boolean, default: false },
+    isShared: { type: Boolean, default: false },
+    shareToken: { type: String, unique: true, sparse: true },
   },
   { timestamps: true },
 );
