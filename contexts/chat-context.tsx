@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 interface ChatContextType {
     prompt: string
     setPrompt: (value: string) => void
+    searchQuery: string
+    setSearchQuery: (value: string) => void
     selectedFiles: File[]
     setSelectedFiles: (files: File[] | ((prev: File[]) => File[])) => void
     fileInputRef: React.RefObject<HTMLInputElement | null>
@@ -19,6 +21,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
     const [prompt, setPrompt] = useState("")
+    const [searchQuery, setSearchQuery] = useState("")
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -34,7 +37,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const sendMessage = async (prompt: string, agentId: string, files: File[], chatId?: string) => {
         if (isLoading) return
         setIsLoading(true)
-
         try {
             const imageParts = await Promise.all(
                 files.map(async (file) => {
@@ -46,18 +48,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                     return { data: base64, mimeType: file.type }
                 })
             )
-
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt, agentId, images: imageParts, chatId })
             })
-
             const data = await res.json()
-
-            if (data.chatId && !chatId) {
-                router.push(`/chat/${data.chatId}`)
-            }
+            if (data.chatId && !chatId) router.push(`/chat/${data.chatId}`)
         } catch (error) {
             console.error(error)
         } finally {
@@ -68,7 +65,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     return (
         <ChatContext.Provider value={{
-            prompt, setPrompt, selectedFiles, setSelectedFiles,
+            prompt, setPrompt, searchQuery, setSearchQuery, selectedFiles, setSelectedFiles,
             fileInputRef, triggerFileInput, resetChat, sendMessage, isLoading
         }}>
             {children}

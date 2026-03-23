@@ -17,7 +17,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function Sidebar() {
     const { variant, toggleSidebar } = useSidebar()
-    const { resetChat } = useChatState()
+    const { resetChat, searchQuery } = useChatState()
     const { data: session } = useSession()
     const { id: activeChatId } = useParams()
     const router = useRouter()
@@ -28,8 +28,13 @@ export function Sidebar() {
     useEffect(() => { setMounted(true) }, [])
 
     const isCollapsed = variant === "collapsed"
-    const pinnedChats = chats?.filter((c: any) => c.isPinned) || []
-    const otherChats = chats?.filter((c: any) => !c.isPinned) || []
+
+    const filteredChats = chats?.filter((chat: any) =>
+        chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || []
+
+    const pinnedChats = filteredChats.filter((c: any) => c.isPinned)
+    const otherChats = filteredChats.filter((c: any) => !c.isPinned)
 
     if (!mounted) return <aside className="h-full bg-surface w-70 border-r border-border/50" />
 
@@ -46,12 +51,7 @@ export function Sidebar() {
 
             <div className={cn("mb-6 shrink-0 px-3", isCollapsed && "px-2")}>
                 <button onClick={() => { resetChat(); router.push("/"); }} className="w-full">
-                    <NavItem
-                        icon={<PlusIcon size={20} />}
-                        label="Nouveau chat"
-                        collapsed={isCollapsed}
-                        className="bg-background border border-border/30 hover:border-brand/40 hover:bg-brand/5 transition-all"
-                    />
+                    <NavItem icon={<PlusIcon size={20} />} label="Nouveau chat" collapsed={isCollapsed} className="bg-background border border-border/30 hover:border-brand/40 hover:bg-brand/5 transition-all" />
                 </button>
             </div>
 
@@ -66,31 +66,25 @@ export function Sidebar() {
                             </div>
                         )}
                         {pinnedChats.map((chat: any) => (
-                            <ChatEntry
-                                key={chat._id}
-                                chat={chat}
-                                activeId={activeChatId as string}
-                                collapsed={isCollapsed}
-                                isPinnedView
-                            />
+                            <ChatEntry key={chat._id} chat={chat} activeId={activeChatId as string} collapsed={isCollapsed} isPinnedView />
                         ))}
                     </div>
                 )}
 
                 <div className="space-y-1">
-                    {!isCollapsed && (
+                    {!isCollapsed && filteredChats.length > 0 && (
                         <div className="px-4 mb-2 text-[10px] font-bold text-foreground/30 uppercase tracking-widest">
-                            Récent
+                            {searchQuery ? "Résultats" : "Récent"}
                         </div>
                     )}
                     {otherChats.map((chat: any) => (
-                        <ChatEntry
-                            key={chat._id}
-                            chat={chat}
-                            activeId={activeChatId as string}
-                            collapsed={isCollapsed}
-                        />
+                        <ChatEntry key={chat._id} chat={chat} activeId={activeChatId as string} collapsed={isCollapsed} />
                     ))}
+                    {!isLoading && filteredChats.length === 0 && searchQuery && (
+                        <div className="px-4 py-8 text-center text-xs text-foreground/30 font-medium">
+                            Aucun résultat pour "{searchQuery}"
+                        </div>
+                    )}
                 </div>
 
                 {isLoading && !chats && !isCollapsed && (
