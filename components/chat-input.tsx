@@ -1,5 +1,6 @@
 import { ImageIcon, MicIcon, SendIcon } from "lucide-react";
 import { IconButton } from "./ui/icon-button";
+import { appConfig } from "@/lib/config";
 
 export function ChatInput() {
     return (
@@ -19,7 +20,7 @@ export function ChatInput() {
                 </div>
             </div>
             <p className="text-[11px] text-center mt-3 text-gray-500">
-                Gemini may display inaccurate info, including about people, so double-check its responses.
+                {appConfig.appName} may display inaccurate info, including about people, so double-check its responses.
             </p>
         </div>
     )
