@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, ReactNode, useRef } from "react"
+import { useRouter } from "next/navigation"
 
 interface ChatContextType {
     prompt: string
@@ -10,6 +11,8 @@ interface ChatContextType {
     fileInputRef: React.RefObject<HTMLInputElement | null>
     triggerFileInput: () => void
     resetChat: () => void
+    sendMessage: (prompt: string, agentId: string, files: File[], chatId?: string) => Promise<void>
+    isLoading: boolean
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -17,7 +20,9 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 export function ChatProvider({ children }: { children: ReactNode }) {
     const [prompt, setPrompt] = useState("")
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+    const [isLoading, setIsLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const router = useRouter()
 
     const triggerFileInput = () => fileInputRef.current?.click()
 
@@ -26,10 +31,45 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setSelectedFiles([])
     }
 
+    const sendMessage = async (prompt: string, agentId: string, files: File[], chatId?: string) => {
+        if (isLoading) return
+        setIsLoading(true)
+
+        try {
+            const imageParts = await Promise.all(
+                files.map(async (file) => {
+                    const base64 = await new Promise<string>((resolve) => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => resolve((reader.result as string).split(",")[1])
+                        reader.readAsDataURL(file)
+                    })
+                    return { data: base64, mimeType: file.type }
+                })
+            )
+
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt, agentId, images: imageParts, chatId })
+            })
+
+            const data = await res.json()
+
+            if (data.chatId && !chatId) {
+                router.push(`/chat/${data.chatId}`)
+            }
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsLoading(false)
+            resetChat()
+        }
+    }
+
     return (
         <ChatContext.Provider value={{
             prompt, setPrompt, selectedFiles, setSelectedFiles,
-            fileInputRef, triggerFileInput, resetChat
+            fileInputRef, triggerFileInput, resetChat, sendMessage, isLoading
         }}>
             {children}
         </ChatContext.Provider>

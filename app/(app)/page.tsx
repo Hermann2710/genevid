@@ -2,7 +2,6 @@
 
 import { Sparkles, Image as ImageIcon, Code, Search, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { appConfig } from "@/lib/config"
 import { useChatState } from "@/contexts/chat-context"
 
 const SUGGESTIONS = [
