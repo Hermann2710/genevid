@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import { AppWrapper } from "@/components/providers/app-wrapper";
 
 const poppins = Poppins({
+  subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
 });
 
 export const metadata: Metadata = {
   title: "Genevid",
-  description: "Generateur d'image et de video basé sur Nano Banana",
+  description: "Générateur d'images et de vidéos basé sur Nano Banana",
 };
 
 export default function RootLayout({
@@ -18,13 +19,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="fr"
-      className={`${poppins.className} h-full`}
-    >
-      <SessionProvider>
-        <body>{children}</body>
-      </SessionProvider>
+    <html lang="fr" className="h-full">
+      <body className={`${poppins.className} h-full antialiased bg-[#131314] text-[#e3e3e3]`}>
+        <AppWrapper>
+          {children}
+        </AppWrapper>
+      </body>
     </html>
   );
 }
